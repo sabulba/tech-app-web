@@ -1,0 +1,397 @@
+<div class="min-h-screen" style="background: #607d8b;">
+  <!-- Bootstrap Navbar with Bluetooth Status - Two Rows -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <div class="d-flex flex-column w-100">
+        <div class="d-flex align-items-center mb-2">
+          <i class="fas fa-robot me-3" style="color: #fff;"></i>
+          <span class="flex-grow-1" style="color: #fff;">Robot BLE Monitor</span>
+        </div>
+        <div class="d-flex align-items-center">
+          <i class="fas fa-signal me-2" style="color: #fff;"></i>
+          <span class="flex-grow-1" style="color: #fff;">Connection Status</span>
+          <i class="fas fa-bluetooth" [style.color]="connectionState() === 'connected' ? '#00ff00' : '#ff0000'"></i>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid p-4">
+    <!-- NFC Error Notification -->
+    @if (nfcError()) {
+      <div class="card border-start border-warning border-5 mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-start gap-3">
+            <i class="fas fa-exclamation-circle text-warning fs-3"></i>
+            <div class="flex-grow-1">
+              <p class="fw-bold mb-1">NFC Status</p>
+              <p class="mb-0 small">{{ nfcError() }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Connection Card -->
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center">
+        <i class="fas fa-plug me-3"></i>
+        <h5 class="mb-0">Connection</h5>
+      </div>
+      
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="deviceName" class="form-label">
+              <i class="fas fa-tablet-alt me-2"></i>Robot Device Name
+            </label>
+            <div class="input-group">
+              <input 
+                type="text" 
+                class="form-control" 
+                id="deviceName"
+                [(ngModel)]="deviceName" 
+                placeholder="Enter device name"
+                [disabled]="scanning() || connected()"
+              />
+              <button 
+                class="btn btn-outline-secondary"
+                type="button"
+                (click)="startNfcScan()"
+                [disabled]="scanning() || connected() || nfcScanning()"
+                title="Scan NFC Tag"
+              >
+                <i [class]="nfcScanning() ? 'fas fa-spinner fa-spin' : 'fas fa-nfc-symbol'"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-6 d-flex align-items-end gap-2">
+            <button 
+              class="btn btn-primary"
+              (click)="scanDevice()" 
+              [disabled]="scanning() || !deviceName() || connected()"
+            >
+              <i [class]="scanning() ? 'fas fa-spinner fa-spin' : 'fas fa-link'"></i>
+              {{ scanning() ? 'Connecting...' : 'Connect' }}
+            </button>
+
+            @if (connected()) {
+              <button 
+                class="btn btn-danger"
+                (click)="disconnect()"
+              >
+                <i class="fas fa-unlink"></i>
+                Disconnect
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Robot Status Card with Active Tab Content -->
+    @if (connected() && robotStatus()) {
+      <div class="card">
+        <div class="card-header d-flex align-items-center">
+          <i class="fas fa-tachometer-alt me-3"></i>
+          <div>
+            <h5 class="mb-0 card-title">Robot Status</h5>
+            <small class="card-subtitle">Updates every second</small>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <!-- Display Active Tab Content -->
+          @if (activeTab() === 'basic') {
+            <div class="py-3">
+              <div class="data-row">
+                <span class="data-label">Message ID</span>
+                <span class="data-value">{{ robotStatus()?.msgId ?? 'N/A' }}</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">Tool Type</span>
+                <span class="data-value">{{ getToolTypeName(robotStatus()?.tig) }}</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">Action Requests</span>
+                <span class="data-value">{{ robotStatus()?.ar ?? 'N/A' }}</span>
+              </div>
+            </div>
+          }
+
+          @if (activeTab() === 'position') {
+            <div class="py-3">
+              <div class="mb-4">
+                <h3 class="mb-3">Position (m)</h3>
+                <div class="data-row">
+                  <span class="data-label">X-Axis</span>
+                  <span class="data-value">{{ robotStatus()?.posm?.x?.toFixed(3) ?? 'N/A' }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Y-Axis</span>
+                  <span class="data-value">{{ robotStatus()?.posm?.y?.toFixed(3) ?? 'N/A' }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Z-Axis</span>
+                  <span class="data-value">{{ robotStatus()?.posm?.z?.toFixed(3) ?? 'N/A' }}</span>
+                </div>
+              </div>
+
+              <hr class="my-4" style="border-color: #546e7a;">
+
+              <div class="mb-4">
+                <h3 class="mb-3">Ticks</h3>
+                <div class="data-row">
+                  <span class="data-label">Ticks A</span>
+                  <span class="data-value">{{ robotStatus()?.pos?.a ?? 'N/A' }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Ticks B</span>
+                  <span class="data-value">{{ robotStatus()?.pos?.b ?? 'N/A' }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Ticks C</span>
+                  <span class="data-value">{{ robotStatus()?.pos?.c ?? 'N/A' }}</span>
+                </div>
+              </div>
+
+              <hr class="my-4" style="border-color: #546e7a;">
+
+              <div>
+                <h3 class="mb-3">Platform (m)</h3>
+                <div class="data-row">
+                  <span class="data-label">X-Axis</span>
+                  <span class="data-value">{{ robotStatus()?.posmPlat?.x?.toFixed(3) ?? 'N/A' }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Y-Axis</span>
+                  <span class="data-value">{{ robotStatus()?.posmPlat?.y?.toFixed(3) ?? 'N/A' }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Z-Axis</span>
+                  <span class="data-value">{{ robotStatus()?.posmPlat?.z?.toFixed(3) ?? 'N/A' }}</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (activeTab() === 'motor') {
+            <div class="py-3">
+              <div class="mb-4">
+                <h3 class="mb-3">Motor Power</h3>
+                <div class="data-row">
+                  <span class="data-label">Motor A</span>
+                  <span class="data-value" style="font-size: 2rem;" [style.color]="robotStatus()?.ma ? '#00ff00' : '#ff0000'">
+                    {{ robotStatus()?.ma ? '✓' : '✗' }}
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Motor B</span>
+                  <span class="data-value" style="font-size: 2rem;" [style.color]="robotStatus()?.mb ? '#00ff00' : '#ff0000'">
+                    {{ robotStatus()?.mb ? '✓' : '✗' }}
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Motor C</span>
+                  <span class="data-value" style="font-size: 2rem;" [style.color]="robotStatus()?.mc ? '#00ff00' : '#ff0000'">
+                    {{ robotStatus()?.mc ? '✓' : '✗' }}
+                  </span>
+                </div>
+              </div>
+
+              <hr class="my-4" style="border-color: #546e7a;">
+
+              <div>
+                <h3 class="mb-3">Homing Status</h3>
+                <div class="data-row">
+                  <span class="data-label">Homing A</span>
+                  <span class="data-value">{{ getHomingStatusName(robotStatus()?.ha) }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Homing B</span>
+                  <span class="data-value">{{ getHomingStatusName(robotStatus()?.hb) }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Homing C</span>
+                  <span class="data-value">{{ getHomingStatusName(robotStatus()?.hc) }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Homing All</span>
+                  <span class="data-value" [style.color]="robotStatus()?.hall === 100 ? '#37474f' : '#000'">
+                    {{ getHomingStatusName(robotStatus()?.hall) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (activeTab() === 'gripper') {
+            <div class="py-3">
+              <div class="mb-4">
+                <h3 class="mb-3">Phasing Status</h3>
+                <div class="data-row">
+                  <span class="data-label">Phasing A</span>
+                  <span class="data-value">{{ getPhasingStatusName(robotStatus()?.apa) }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Phasing B</span>
+                  <span class="data-value">{{ getPhasingStatusName(robotStatus()?.apb) }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Phasing C</span>
+                  <span class="data-value">{{ getPhasingStatusName(robotStatus()?.apc) }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Phasing All</span>
+                  <span class="data-value" [style.color]="robotStatus()?.apall === 2 ? '#37474f' : '#000'">
+                    {{ getPhasingStatusName(robotStatus()?.apall) }}
+                  </span>
+                </div>
+              </div>
+
+              <hr class="my-4" style="border-color: #546e7a;">
+
+              <div>
+                <h3 class="mb-3">Gripper Status</h3>
+                <div class="data-row">
+                  <span class="data-label">Upper Gripper</span>
+                  <span class="data-value">{{ getGripperStatusName(robotStatus()?.ug) }}</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Lower Gripper</span>
+                  <span class="data-value">{{ getGripperStatusName(robotStatus()?.lg) }}</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (activeTab() === 'info') {
+            <div class="py-3">
+              <div class="data-row">
+                <span class="data-label">Test Mode</span>
+                <span class="data-value" style="font-size: 2rem;" [style.color]="isRobotInTestMode() ? '#00ff00' : '#ff0000'">
+                  {{ isRobotInTestMode() ? '✓' : '✗' }}
+                </span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">Ready for Mapping</span>
+                <span class="data-value" style="font-size: 2rem;" [style.color]="isRobotReadyForMapping() ? '#00ff00' : '#ff0000'">
+                  {{ isRobotReadyForMapping() ? '✓' : '✗' }}
+                </span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">Has Map</span>
+                <span class="data-value" style="font-size: 2rem;" [style.color]="robotStatus()?.hasMap ? '#00ff00' : '#ff0000'">
+                  {{ robotStatus()?.hasMap ? '✓' : '✗' }}
+                </span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">IP Address</span>
+                <span class="data-value" style="font-family: monospace;">{{ robotStatus()?.ip ?? 'N/A' }}</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">Firmware</span>
+                <span class="data-value" style="font-family: monospace;">{{ robotStatus()?.v ?? 'N/A' }}</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">Alerts</span>
+                <span class="data-value" [style.color]="robotStatus()?.al && robotStatus()!.al!.length > 0 ? '#ff0000' : '#00ff00'">
+                  {{ robotStatus()?.al && robotStatus()!.al!.length > 0 ? robotStatus()!.al!.join(', ') : 'None' }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <hr class="m-0" style="border-color: #546e7a;">
+
+        <div class="card-footer text-center py-3 d-flex align-items-center justify-content-center">
+          <i class="fas fa-sync-alt me-2" style="color: #37474f;"></i>
+          <small class="text-muted fst-italic">Updates every second</small>
+        </div>
+      </div>
+    }
+
+    <!-- Messages -->
+    @if (scanning()) {
+      <div class="card border-start border-primary border-5 mb-3">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <span class="fw-bold">Connecting to {{ deviceName() }}...</span>
+        </div>
+      </div>
+    }
+
+    @if (!connected() && attempted() && !scanning()) {
+      <div class="card border-start border-danger border-5">
+        <div class="card-body">
+          <div class="d-flex align-items-start gap-3">
+            <i class="fas fa-exclamation-triangle text-danger fs-3"></i>
+            <div class="flex-grow-1">
+              <p class="fw-bold mb-3">Connection failed</p>
+              <ul class="list-unstyled small">
+                <li class="mb-2">
+                  <i class="fas fa-check-circle me-2"></i>
+                  Robot is powered on and advertising
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check-circle me-2"></i>
+                  Correct device name entered
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check-circle me-2"></i>
+                  Bluetooth is enabled
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check-circle me-2"></i>
+                  SERVICE and CHARACTERISTIC UUIDs updated
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Floating Action Button for Menu -->
+  @if (connected() && robotStatus()) {
+    <button class="fab-menu" (click)="openMenu(bottomSheetMenu)">
+      <i class="fas fa-bars"></i>
+    </button>
+  }
+
+  <!-- Bottom Sheet Menu Template -->
+  <ng-template #bottomSheetMenu let-offcanvas>
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" style="color: #fff;">
+        <i class="fas fa-list-ul me-2"></i>Navigation Menu
+      </h5>
+      <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="closeMenu()"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div class="menu-item" [class.active]="activeTab() === 'basic'" (click)="setActiveTab('basic')">
+        <i class="fas fa-info-circle"></i>
+        <span>Basic Information</span>
+      </div>
+      <div class="menu-item" [class.active]="activeTab() === 'position'" (click)="setActiveTab('position')">
+        <i class="fas fa-crosshairs"></i>
+        <span>Position & Coordinates</span>
+      </div>
+      <div class="menu-item" [class.active]="activeTab() === 'motor'" (click)="setActiveTab('motor')">
+        <i class="fas fa-cogs"></i>
+        <span>Motor & Homing</span>
+      </div>
+      <div class="menu-item" [class.active]="activeTab() === 'gripper'" (click)="setActiveTab('gripper')">
+        <i class="fas fa-hand-rock"></i>
+        <span>Gripper & Phasing</span>
+      </div>
+      <div class="menu-item" [class.active]="activeTab() === 'info'" (click)="setActiveTab('info')">
+        <i class="fas fa-microchip"></i>
+        <span>System Information</span>
+      </div>
+    </div>
+  </ng-template>
+</div>
