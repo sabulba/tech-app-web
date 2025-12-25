@@ -6,6 +6,7 @@ import {
   ActionRequests,
   RobotStatusHelper 
 } from '../models/robot-status.model';
+import { RobotEndpoints } from '../models/robot-endpoints';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +41,11 @@ export class BleService {
     try {
       this.device = await navigator.bluetooth.requestDevice({
         filters: deviceName ? [{ name: deviceName }] : [],
-        optionalServices: [this.ROBOT_SERVICE_UUID]
+        optionalServices: [
+          this.ROBOT_SERVICE_UUID,
+          RobotEndpoints.CMD_SERVICE_GUID,
+          RobotEndpoints.SET_SERVICE_GUID
+        ]
       });
       
       this.connectionStateSubject.next('connecting');
@@ -180,6 +185,20 @@ export class BleService {
 
   getToolType(): RobotToolType {
     return this.robotStatusSubject.value?.tig ?? RobotToolType.Unknown;
+  }
+
+  /**
+   * Get the GATT server for sending commands
+   */
+  getGattServer(): BluetoothRemoteGATTServer | null {
+    return this.server;
+  }
+
+  /**
+   * Check if connected to device
+   */
+  isConnected(): boolean {
+    return this.server?.connected ?? false;
   }
 
   private handleDisconnection() {

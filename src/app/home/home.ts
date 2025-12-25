@@ -5,18 +5,19 @@ import { Subscription } from 'rxjs';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { BleService } from '../services/ble.service';
 import { NfcService } from '../services/nfc.service';
-import { 
-  RobotStatus, 
-  RobotToolType, 
-  HomingStatus, 
-  PhasingStatus, 
-  GripperStatus 
+import { RobotCommandService } from '../services/robot-command.service';
+import {
+  RobotStatus,
+  RobotToolType,
+  HomingStatus,
+  PhasingStatus,
+  GripperStatus
 } from '../models/robot-status.model';
 
 @Component({
   selector: 'app-home',
   imports: [
-    FormsModule, 
+    FormsModule,
     CommonModule
   ],
   templateUrl: './home.html'
@@ -33,15 +34,27 @@ export class Home implements OnInit, OnDestroy {
   protected readonly nfcError = signal<string | null>(null);
   protected readonly nfcScanning = signal(false);
 
+  // Testing params
+  protected readonly robotNumber = signal<number>(1);
+  protected readonly negativePlatform = signal<boolean>(false);
+  protected readonly testingParamsSaving = signal(false);
+  protected readonly testingParamsSaved = signal(false);
+  protected readonly robotRoles = [1, 2, 3, 4, 5, 6, 7];
+
+  // Mapping params
+  protected readonly mappingPreparing = signal(false);
+  protected readonly mappingPrepared = signal(false);
+
   private statusSubscription?: Subscription;
   private connectionSubscription?: Subscription;
   private nfcTextSubscription?: Subscription;
   private nfcErrorSubscription?: Subscription;
 
   constructor(
-    private bleService: BleService, 
+    private bleService: BleService,
     private offcanvasService: NgbOffcanvas,
-    private nfcService: NfcService
+    private nfcService: NfcService,
+    private robotCommandService: RobotCommandService
   ) {}
 
   ngOnInit() {
@@ -54,7 +67,7 @@ export class Home implements OnInit, OnDestroy {
     // Subscribe to robot status updates
     this.statusSubscription = this.bleService.robotStatus$.subscribe(status => {
       this.robotStatus.set(status);
-      
+
       // React to status changes here
       if (status) {
         console.log('Status update received:', {
@@ -64,7 +77,7 @@ export class Home implements OnInit, OnDestroy {
           inTestMode: this.isRobotInTestMode(),
           readyForMapping: this.isRobotReadyForMapping()
         });
-        
+
         // Example: React when test mode changes
         // if (this.isRobotInTestMode()) {
         //   console.log('Robot entered test mode!');
@@ -101,13 +114,13 @@ export class Home implements OnInit, OnDestroy {
   async scanDevice() {
     // Must call BLE immediately to preserve user gesture
     const deviceNameValue = this.deviceName();
-    
+
     // Set state AFTER starting the BLE request to maintain user gesture
     const connectPromise = this.bleService.connectToRobot(deviceNameValue);
-    
+
     this.scanning.set(true);
     this.attempted.set(true);
-    
+
     const result = await connectPromise;
     this.connected.set(result);
     this.scanning.set(false);
@@ -182,7 +195,7 @@ export class Home implements OnInit, OnDestroy {
   }
 
   openMenu(content: any) {
-    this.offcanvasService.open(content, { 
+    this.offcanvasService.open(content, {
       position: 'bottom',
       panelClass: 'bottom-sheet-menu',
       backdrop: true
@@ -217,5 +230,46 @@ export class Home implements OnInit, OnDestroy {
     this.nfcScanning.set(true);
     this.nfcError.set(null);
     await this.nfcService.startScan();
+  }
+
+  async saveTestingParams() {
+    this.testingParamsSaving.set(true);
+    this.testingParamsSaved.set(false);
+
+    await this.robotCommandService.prepareForRobotTestForTesting(
+      this.robotNumber(),
+      this.negativePlatform(),
+      (succeed) => {
+        this.testingParamsSaving.set(false);
+        if (succeed) {
+          this.testingParamsSaved.set(true);
+          setTimeout(() => this.testingParamsSaved.set(false), 3000);
+        } else {
+          alert('Failed to save testing parameters. Make sure you are connected to the robot.');
+        }
+      }
+    );
+  }
+
+  async prepareForMapping() {
+    this.mappingPreparing.set(true);
+    this.mappingPrepared.set(false);
+
+    await this.robotCommandService.prepareForMapping(
+      this.robotNumber(),
+      this.negativePlatform(),
+      this.deviceName(),
+      (succeed) => {
+        this.mappingPreparing.set(false);
+        if (succeed) {
+          this.mappingPrepared.set(true);
+          setTimeout(
+            () => this.mappingPrepared.set(false),
+            3000);
+        } else {
+          alert('Failed to prepare for mapping. Make sure you are connected to the robot.');
+        }
+      }
+    );
   }
 }

@@ -1,0 +1,75 @@
+<!-- Bootstrap Navbar -->
+<nav class="navbar navbar-dark bg-dark fixed-top py-2">
+  <div class="container-fluid">
+    <div class="d-flex w-100 align-items-center">
+      <!-- Back Button - Left -->
+
+        <i class="fas fa-chevron-left text-white m4-5 border-0"   (click)="goBack()"></i>
+
+      <!-- BLE Connection Status Icon -->
+      <i
+        class="fas fa-bluetooth me-2"
+        [style.color]="connectionState() === 'connected' ? '#00ff00' : '#ff0000'"
+        style="font-size: 0.875rem;"
+      ></i>
+      <!-- Title - Center (flex-grow to center) -->
+      <div class="d-flex align-items-center justify-content-center flex-grow-1">
+        <h1 class="navbar-brand mb-0">{{ pageTitle() }}</h1>
+      </div>
+      <!-- Hamburger Button - Right -->
+      <button
+        class="btn text-white p-0 border-0 justify-end"
+        type="button"
+        (click)="toggleSidebar()"
+        style="background: none; font-size: 0.875rem;"
+      >
+        <i class="fas fa-bars"></i>
+      </button>
+
+
+    </div>
+  </div>
+</nav>
+
+<!-- Bootstrap Off canvas Sidebar -->
+<div
+  class="offcanvas offcanvas-start"
+  [class.show]="isOpen()"
+  tabindex="-1"
+  [style.visibility]="isOpen() ? 'visible' : 'hidden'"
+>
+  <div class="offcanvas-header bg-dark text-white">
+    <h5 class="offcanvas-title">
+      <i class="fas fa-robot text-info me-2"></i>
+      Navigation Menu
+    </h5>
+    <button
+      type="button"
+      class="btn-close btn-close-white"
+      (click)="closeSidebar()"
+    ></button>
+  </div>
+  <div class="offcanvas-body bg-dark p-0">
+    <div class="list-group list-group-flush">
+      @for (item of navItems; track item.path) {
+        <a
+          [routerLink]="item.path"
+          (click)="closeSidebar()"
+          routerLinkActive="active"
+          class="list-group-item list-group-item-action bg-dark text-white border-0"
+        >
+          <i class="fas {{ item.icon }} me-3"></i>
+          {{ item.label }}
+        </a>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop -->
+@if (isOpen()) {
+  <div
+    class="offcanvas-backdrop fade show"
+    (click)="closeSidebar()"
+  ></div>
+}

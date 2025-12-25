@@ -1,0 +1,104 @@
+<div class="min-vh-100 mt-2"  style="background: #607d8b;">
+  <div class="container-fluid p-4">
+
+    <!-- Success Messages -->
+    @if (commandSent()) {
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        Command sent successfully!
+      </div>
+    }
+    
+    @if (stopCommandSent()) {
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        Stop move command sent successfully!
+      </div>
+    }
+
+    <!-- Device Selection Card -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0 d-flex align-items-center">
+          <i class="fas fa-cog me-2"></i>
+          Select Device
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label for="deviceType" class="form-label">Device Type</label>
+            <div class="input-group">
+              <select
+                class="form-select"
+                id="deviceType"
+                [(ngModel)]="selectedDeviceType"
+              >
+                <option value="">Select device type...</option>
+                @for (type of deviceTypes; track type) {
+                  <option [value]="type">{{ getTaskTypeName(type) }}</option>
+                }
+              </select>
+              <select
+                class="form-select"
+                id="deviceIndex"
+                [(ngModel)]="selectedIndex"
+                style="max-width: 80px;"
+              >
+                @for (index of indices; track index) {
+                  <option [value]="index">{{ index }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <button
+              class="btn btn-success w-100"
+              (click)="sendCommand()"
+              [disabled]="!selectedDeviceType()"
+            >
+              <i class="fas fa-play me-2"></i>
+              Go
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stop Move Command Card -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0 d-flex align-items-center">
+          <i class="fas fa-stop-circle me-2"></i>
+          Stop Move Command
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label for="motorType" class="form-label">Motor Type</label>
+            <select
+              class="form-select"
+              id="motorType"
+              [(ngModel)]="selectedMotorType"
+            >
+              @for (motor of motorTypes; track motor.value) {
+                <option [value]="motor.value">{{ motor.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button
+              class="btn btn-danger w-100"
+              (click)="sendStopMoveCommand()"
+            >
+              <i class="fas fa-stop me-2"></i>
+              Stop
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

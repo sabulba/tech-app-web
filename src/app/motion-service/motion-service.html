@@ -1,0 +1,511 @@
+<div class="container-fluid py-3">
+  <!-- Status Messages -->
+  @if (statusMessage()) {
+    <div class="alert" [ngClass]="{'alert-success': statusType() === 'success', 'alert-danger': statusType() === 'error'}" role="alert">
+      <i class="fas" [ngClass]="{'fa-check-circle': statusType() === 'success', 'fa-exclamation-circle': statusType() === 'error'}"></i>
+      {{ statusMessage() }}
+    </div>
+  }
+
+  <!-- AUTO PHASING -->
+  <div class="section-title">Auto Phasing</div>
+  <div class="card mb-3">
+    <div class="card-body text-center p-3">
+      <div class="d-flex flex-wrap justify-content-center gap-2">
+        <button class="btn btn-primary" style="width: 7rem; height: 2.25rem; border-radius: 1rem; padding: 4px !important; display: flex; align-items: center; justify-content: center; gap: 0.3rem; font-size: 11px;" [ngClass]="{'done': isActionActive('phasing_A')}" (click)="sendAutoPhasingCmd(MotorType.A)">
+          <i class="fas fa-sync-alt" style="font-size: 10px;"></i> Axis X
+        </button>
+        <button class="btn btn-primary" style="width: 7rem; height: 2.25rem; border-radius: 1rem; padding: 4px !important; display: flex; align-items: center; justify-content: center; gap: 0.3rem; font-size: 11px;" [ngClass]="{'done': isActionActive('phasing_B')}" (click)="sendAutoPhasingCmd(MotorType.B)">
+          <i class="fas fa-sync-alt" style="font-size: 10px;"></i> Axis Y
+        </button>
+        <button class="btn btn-primary" style="width: 7rem; height: 2.25rem; border-radius: 1rem; padding: 4px !important; display: flex; align-items: center; justify-content: center; gap: 0.3rem; font-size: 11px;" [ngClass]="{'done': isActionActive('phasing_C')}" (click)="sendAutoPhasingCmd(MotorType.C)">
+          <i class="fas fa-sync-alt" style="font-size: 10px;"></i> Axis Z
+        </button>
+        <button class="btn btn-primary" style="width: 7rem; height: 2.25rem; border-radius: 1rem; padding: 4px !important; display: flex; align-items: center; justify-content: center; gap: 0.3rem; font-size: 11px;" [ngClass]="{'done': isActionActive('phasing_All')}" (click)="sendAutoPhasingCmd(MotorType.All)">
+          <i class="fas fa-sync-alt" style="font-size: 10px;"></i> All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- HOMING -->
+  <div class="section-title">Homing</div>
+  <div class="card mb-3">
+    <div class="card-body text-center p-3">
+      <div class="d-flex flex-wrap justify-content-center gap-2">
+        <button class="btn btn-primary" style="width: 7rem; height: 2.25rem; border-radius: 1rem; padding: 4px !important; display: flex; align-items: center; justify-content: center; gap: 0.3rem; font-size: 11px;" [ngClass]="{'done': isActionActive('homing_B')}" (click)="sendAutoHomingCmd(MotorType.B)">
+          <i class="fas fa-home" style="font-size: 10px;"></i> Axis Y
+        </button>
+        <button class="btn btn-primary" style="width: 7rem; height: 2.25rem; border-radius: 1rem; padding: 4px !important; display: flex; align-items: center; justify-content: center; gap: 0.3rem; font-size: 11px;" [ngClass]="{'done': isActionActive('homing_C')}" (click)="sendAutoHomingCmd(MotorType.C)">
+          <i class="fas fa-home" style="font-size: 10px;"></i> Axis Z
+        </button>
+        <button class="btn btn-primary" style="width: 7rem; height: 2.25rem; border-radius: 1rem; padding: 4px !important; display: flex; align-items: center; justify-content: center; gap: 0.3rem; font-size: 11px;" [ngClass]="{'done': isActionActive('homing_ArmOnly')}" (click)="sendAutoHomingCmd(MotorType.ArmOnly)">
+          <i class="fas fa-home" style="font-size: 10px;"></i> All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- MOTORS -->
+  <div class="section-title">Motors</div>
+  <div class="row g-2 mb-3">
+    <!-- All Motors -->
+    <div class="col-12 col-md-4">
+      <div class="card h-100">
+        <div class="card-body text-center p-2">
+          <h6 class="card-title mb-2" style="font-size: 14px;">All Motors</h6>
+          <div class="d-flex justify-content-center gap-2">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" (click)="setMotorPower(MotorType.ArmOnly, true)">
+              <i class="fas fa-power-off"></i> ON
+            </button>
+            <button class="btn btn-danger" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" (click)="setMotorPower(MotorType.ArmOnly, false)">
+              <i class="fas fa-power-off"></i> OFF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Motor Z -->
+    <div class="col-12 col-md-4">
+      <div class="card h-100">
+        <div class="card-body text-center p-2">
+          <h6 class="card-title mb-2" style="font-size: 14px;">Z</h6>
+          <div class="d-flex justify-content-center gap-2">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" (click)="setMotorPower(MotorType.C, true)">
+              <i class="fas fa-power-off"></i> ON
+            </button>
+            <button class="btn btn-danger" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" (click)="setMotorPower(MotorType.C, false)">
+              <i class="fas fa-power-off"></i> OFF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Motor Y -->
+    <div class="col-12 col-md-4">
+      <div class="card h-100">
+        <div class="card-body text-center p-2">
+          <h6 class="card-title mb-2" style="font-size: 14px;">Y</h6>
+          <div class="d-flex justify-content-center gap-2">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" (click)="setMotorPower(MotorType.B, true)">
+              <i class="fas fa-power-off"></i> ON
+            </button>
+            <button class="btn btn-danger" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" (click)="setMotorPower(MotorType.B, false)">
+              <i class="fas fa-power-off"></i> OFF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- MOTORS -->
+  <div class="section-title">Motors</div>
+  <div class="container-fluid" style="margin-bottom: 5rem;">
+    <ul class="nav nav-tabs" id="motorTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="motor-z-tab" data-bs-toggle="tab" data-bs-target="#motor-z-panel" type="button" role="tab" aria-controls="motor-z-panel" aria-selected="true">
+          Z
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="motor-y-tab" data-bs-toggle="tab" data-bs-target="#motor-y-panel" type="button" role="tab" aria-controls="motor-y-panel" aria-selected="false">
+          Y
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="motorTabsContent">
+      <!-- MOTOR Z TAB -->
+      <div class="tab-pane fade show active" id="motor-z-panel" role="tabpanel" aria-labelledby="motor-z-tab">
+        <div class="p-3">
+          <!-- Target 1 -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('move_Z_1')}" (click)="sendMotorMove(target1MotorZ(), 'Z', 1)">
+              Go 1
+            </button>
+            <div>
+              <label class="form-label fw-bold mb-1" style="font-size: 10px; text-align: center; display: block;">Target 1</label>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementValue(target1MotorZ, 0.001, 0, 1)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [(ngModel)]="target1MotorZ" step="0.001" min="0" max="1">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementValue(target1MotorZ, 0.001, 0, 1)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Target 2 -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('move_Z_2')}" (click)="sendMotorMove(target2MotorZ(), 'Z', 2)">
+              Go 2
+            </button>
+            <div>
+              <label class="form-label fw-bold mb-1" style="font-size: 10px; text-align: center; display: block;">Target 2</label>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementValue(target2MotorZ, 0.001, 0, 1)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [(ngModel)]="target2MotorZ" step="0.001" min="0" max="1">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementValue(target2MotorZ, 0.001, 0, 1)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Repeat -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <button class="btn btn-danger" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('stop_repeat_Z')}" (click)="stopMotorRepeat('Z')">
+                Stop
+              </button>
+              <button class="btn btn-warning" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('repeat_Z')}" (click)="sendMotorRepeat('Z', repeatDurationMotorZ(), target1MotorZ(), target2MotorZ())">
+                Repeat
+              </button>
+            </div>
+            <div>
+              <label class="form-label fw-bold mb-1" style="font-size: 10px; text-align: center; display: block;">Wait (sec)</label>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementValue(repeatDurationMotorZ, 1, 1, 10)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [(ngModel)]="repeatDurationMotorZ" min="1" max="10">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementValue(repeatDurationMotorZ, 1, 1, 10)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOTOR Y TAB -->
+      <div class="tab-pane fade" id="motor-y-panel" role="tabpanel" aria-labelledby="motor-y-tab">
+        <div class="p-3">
+          <!-- Target 1 -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('move_Y_1')}" (click)="sendMotorMove(target3MotorY(), 'Y', 3)">
+              Go 1
+            </button>
+            <div>
+              <label class="form-label fw-bold mb-1" style="font-size: 10px; text-align: center; display: block;">Target 1</label>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementValue(target3MotorY, 0.001, 0, 1)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [(ngModel)]="target3MotorY" step="0.001" min="0" max="1">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementValue(target3MotorY, 0.001, 0, 1)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Target 2 -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('move_Y_2')}" (click)="sendMotorMove(target4MotorY(), 'Y', 4)">
+              Go 2
+            </button>
+            <div>
+              <label class="form-label fw-bold mb-1" style="font-size: 10px; text-align: center; display: block;">Target 2</label>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementValue(target4MotorY, 0.001, 0, 1)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [(ngModel)]="target4MotorY" step="0.001" min="0" max="1">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementValue(target4MotorY, 0.001, 0, 1)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Repeat -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <button class="btn btn-danger" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('stop_repeat_Y')}" (click)="stopMotorRepeat('Y')">
+                Stop
+              </button>
+              <button class="btn btn-warning" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('repeat_Y')}" (click)="sendMotorRepeat('Y', repeatDurationMotorY(), target3MotorY(), target4MotorY())">
+                Repeat
+              </button>
+            </div>
+            <div>
+              <label class="form-label fw-bold mb-1" style="font-size: 10px; text-align: center; display: block;">Wait (sec)</label>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementValue(repeatDurationMotorY, 1, 1, 10)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [(ngModel)]="repeatDurationMotorY" min="1" max="10">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementValue(repeatDurationMotorY, 1, 1, 10)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- GRIPPERS -->
+  <div class="section-title">Grippers</div>
+  <div class="container-fluid" style="margin-bottom: 5rem;">
+    <ul class="nav nav-tabs" id="gripperTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="gripper-upper-tab" data-bs-toggle="tab" data-bs-target="#gripper-upper-panel" type="button" role="tab" aria-controls="gripper-upper-panel" aria-selected="true">
+          Upper
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="gripper-lower-tab" data-bs-toggle="tab" data-bs-target="#gripper-lower-panel" type="button" role="tab" aria-controls="gripper-lower-panel" aria-selected="false">
+          Lower
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="gripper-both-tab" data-bs-toggle="tab" data-bs-target="#gripper-both-panel" type="button" role="tab" aria-controls="gripper-both-panel" aria-selected="false">
+          Both
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="gripperTabsContent">
+      <!-- GRIPPER UPPER TAB -->
+      <div class="tab-pane fade show active" id="gripper-upper-panel" role="tabpanel" aria-labelledby="gripper-upper-tab">
+        <div class="p-3">
+          <!-- Open -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Upper_open')}" (click)="sendGripperAction(true, GripperType.Upper)">
+              Open
+            </button>
+            <div>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #6c757d; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; visibility: hidden;">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [ngClass]="{'border-danger': !isUpperRangeValid()}" [value]="upperGripperOpenPWM()" readonly>
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #6c757d; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; visibility: hidden;">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Close -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Upper_close')}" (click)="sendGripperAction(false, GripperType.Upper)">
+              Close
+            </button>
+            <div>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementPWM(upperGripperClosePWM); updateUpperGripperPWM(upperGripperClosePWM(), true)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [ngClass]="{'border-danger': !isUpperRangeValid()}" [(ngModel)]="upperGripperClosePWM" (ngModelChange)="updateUpperGripperPWM($event, true)" min="1050" max="2000">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementPWM(upperGripperClosePWM); updateUpperGripperPWM(upperGripperClosePWM(), true)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save/Get PWM -->
+          <div style="display: flex; margin-bottom: 2rem; padding: 0 0.5rem; justify-content: start; width: max-content; gap: 1rem;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': upperGripperSaved() && isUpperRangeValid()}" [disabled]="!isUpperRangeValid()" (click)="saveGripperPWM(GripperType.Upper)">
+              Save PWM
+            </button>
+            <button class="btn btn-info" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('get_Upper_pwm')}" (click)="getGripperPWM(GripperType.Upper)">
+              Get PWM
+            </button>
+          </div>
+          @if (!isUpperRangeValid()) {
+            <div style="text-align: center; margin-bottom: 2rem;">
+              <span class="text-danger fw-bold" style="font-size: 12px;">
+                <i class="fas fa-exclamation-triangle"></i> Error!
+              </span>
+            </div>
+          }
+
+          <!-- Repeat -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <button class="btn btn-danger" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Upper_stop')}" (click)="stopGripperRepeat(GripperType.Upper)">
+                Stop
+              </button>
+              <button class="btn btn-warning" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Upper_repeat')}" (click)="sendGripperRepeat(GripperType.Upper, repeatGripperUpperDuration())">
+                Repeat
+              </button>
+            </div>
+            <div>
+              <label class="form-label fw-bold mb-1" style="font-size: 10px; text-align: center; display: block;">Wait (sec)</label>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementValue(repeatGripperUpperDuration, 1, 1, 10)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [(ngModel)]="repeatGripperUpperDuration" min="1" max="10">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementValue(repeatGripperUpperDuration, 1, 1, 10)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRIPPER LOWER TAB -->
+      <div class="tab-pane fade" id="gripper-lower-panel" role="tabpanel" aria-labelledby="gripper-lower-tab">
+        <div class="p-3">
+          <!-- Open -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Lower_open')}" (click)="sendGripperAction(true, GripperType.Lower)">
+              Open
+            </button>
+            <div>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #6c757d; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; visibility: hidden;">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [ngClass]="{'border-danger': !isLowerRangeValid()}" [value]="lowerGripperOpenPWM()" readonly>
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #6c757d; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; visibility: hidden;">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Close -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Lower_close')}" (click)="sendGripperAction(false, GripperType.Lower)">
+              Close
+            </button>
+            <div>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementPWM(lowerGripperClosePWM); updateLowerGripperPWM(lowerGripperClosePWM(), true)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [ngClass]="{'border-danger': !isLowerRangeValid()}" [(ngModel)]="lowerGripperClosePWM" (ngModelChange)="updateLowerGripperPWM($event, true)" min="1050" max="2000">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementPWM(lowerGripperClosePWM); updateLowerGripperPWM(lowerGripperClosePWM(), true)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save/Get PWM -->
+          <div style="display: flex; margin-bottom: 2rem; padding: 0 0.5rem; justify-content: start; width: max-content; gap: 1rem;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': lowerGripperSaved() && isLowerRangeValid()}" [disabled]="!isLowerRangeValid()" (click)="saveGripperPWM(GripperType.Lower)">
+              Save PWM
+            </button>
+            <button class="btn btn-info" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('get_Lower_pwm')}" (click)="getGripperPWM(GripperType.Lower)">
+              Get PWM
+            </button>
+          </div>
+          @if (!isLowerRangeValid()) {
+            <div style="text-align: center; margin-bottom: 2rem;">
+              <span class="text-danger fw-bold" style="font-size: 12px;">
+                <i class="fas fa-exclamation-triangle"></i> Error!
+              </span>
+            </div>
+          }
+
+          <!-- Repeat -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <button class="btn btn-danger" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Lower_stop')}" (click)="stopGripperRepeat(GripperType.Lower)">
+                Stop
+              </button>
+              <button class="btn btn-warning" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Lower_repeat')}" (click)="sendGripperRepeat(GripperType.Lower, repeatGripperLowerDuration())">
+                Repeat
+              </button>
+            </div>
+            <div>
+              <label class="form-label fw-bold mb-1" style="font-size: 10px; text-align: center; display: block;">Wait (sec)</label>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementValue(repeatGripperLowerDuration, 1, 1, 10)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [(ngModel)]="repeatGripperLowerDuration" min="1" max="10">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementValue(repeatGripperLowerDuration, 1, 1, 10)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRIPPER BOTH TAB -->
+      <div class="tab-pane fade" id="gripper-both-panel" role="tabpanel" aria-labelledby="gripper-both-tab">
+        <div class="p-3">
+          <!-- Open and Close -->
+          <div style="display: flex; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; justify-content: start;">
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Both_open')}" (click)="sendGripperAction(true, GripperType.Both)">
+              Open
+            </button>
+            <button class="btn btn-success" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Both_close')}" (click)="sendGripperAction(false, GripperType.Both)">
+              Close
+            </button>
+          </div>
+
+          <!-- Repeat -->
+          <div style="display: grid; grid-template-columns: 40% 60%; gap: 2rem; margin-bottom: 2rem; padding: 0 0.5rem; align-items: end;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <button class="btn btn-danger" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Both_stop')}" (click)="stopGripperRepeat(GripperType.Both)">
+                Stop
+              </button>
+              <button class="btn btn-warning" style="width: 8rem; height: 2.25rem; border-radius: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" [ngClass]="{'done': isActionActive('gripper_Both_repeat')}" (click)="sendGripperRepeat(GripperType.Both, repeatGripperBothDuration())">
+                Repeat
+              </button>
+            </div>
+            <div>
+              <label class="form-label fw-bold mb-1" style="font-size: 10px; text-align: center; display: block;">Wait (sec)</label>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #dc3545; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementValue(repeatGripperBothDuration, 1, 1, 10)">
+                  <i class="fas fa-minus" style="font-size: 12px;"></i>
+                </button>
+                <input type="number" class="form-control text-center" style="font-size: 26px; height: 2.25rem; flex: 1;" [(ngModel)]="repeatGripperBothDuration" min="1" max="10">
+                <button class="rounded-circle" style="width: 1.5rem; height: 1.5rem; background: #28a745; border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementValue(repeatGripperBothDuration, 1, 1, 10)">
+                  <i class="fas fa-plus" style="font-size: 12px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Bottom Toolbar -->
+  <div class="fixed-bottom border-top" style="background: #546e7a; padding: 1rem; padding-top: 2rem;">
+    <div style="display: flex; gap: 0.5rem;">
+      <button class="footer-btn" [ngClass]="{'done': isActionActive('limit_z')}" (click)="sendLimitZ()">
+        Limit<br>Z
+      </button>
+      <button class="footer-btn" [ngClass]="{'done': isActionActive('fold_arm')}" (click)="sendFoldArm()">
+        Fold<br>Arm
+      </button>
+      <button class="footer-btn" [ngClass]="{'done': isActionActive('open_arm')}" (click)="sendOpenArm()">
+        Open<br>Arm
+      </button>
+      <button class="footer-btn" [ngClass]="{'done': isActionActive('defaults')}" (click)="resetToDefaults()">
+        Default<br>Values
+      </button>
+    </div>
+  </div>
+</div>

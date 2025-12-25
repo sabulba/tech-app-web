@@ -1,25 +1,8 @@
-<div class="min-h-screen" style="background: #607d8b;">
-  <!-- Bootstrap Navbar with Bluetooth Status - Two Rows -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-      <div class="d-flex flex-column w-100">
-        <div class="d-flex align-items-center mb-2">
-          <i class="fas fa-robot me-3" style="color: #fff;"></i>
-          <span class="flex-grow-1" style="color: #fff;">Robot BLE Monitor</span>
-        </div>
-        <div class="d-flex align-items-center">
-          <i class="fas fa-signal me-2" style="color: #fff;"></i>
-          <span class="flex-grow-1" style="color: #fff;">Connection Status</span>
-          <i class="fas fa-bluetooth" [style.color]="connectionState() === 'connected' ? '#00ff00' : '#ff0000'"></i>
-        </div>
-      </div>
-    </div>
-  </nav>
-
+<div class="min-vh-100" style="background: #607d8b;">
   <div class="container-fluid p-4">
-    <!-- NFC Error Notification -->
+   <!-- NFC Error Notification -->
     @if (nfcError()) {
-      <div class="card border-start border-warning border-5 mb-3">
+      <div class="card border-start border-warning border-5 mb-3 mt-2">
         <div class="card-body">
           <div class="d-flex align-items-start gap-3">
             <i class="fas fa-exclamation-circle text-warning fs-3"></i>
@@ -33,12 +16,12 @@
     }
 
     <!-- Connection Card -->
-    <div class="card mb-4">
+    <div class="card mb-4 mt-2">
       <div class="card-header d-flex align-items-center">
         <i class="fas fa-plug me-3"></i>
         <h5 class="mb-0">Connection</h5>
       </div>
-      
+
       <div class="card-body">
         <div class="row g-3">
           <div class="col-md-6">
@@ -46,15 +29,15 @@
               <i class="fas fa-tablet-alt me-2"></i>Robot Device Name
             </label>
             <div class="input-group">
-              <input 
-                type="text" 
-                class="form-control" 
+              <input
+                type="text"
+                class="form-control"
                 id="deviceName"
-                [(ngModel)]="deviceName" 
+                [(ngModel)]="deviceName"
                 placeholder="Enter device name"
                 [disabled]="scanning() || connected()"
               />
-              <button 
+              <button
                 class="btn btn-outline-secondary"
                 type="button"
                 (click)="startNfcScan()"
@@ -66,9 +49,9 @@
             </div>
           </div>
           <div class="col-md-6 d-flex align-items-end gap-2">
-            <button 
+            <button
               class="btn btn-primary"
-              (click)="scanDevice()" 
+              (click)="scanDevice()"
               [disabled]="scanning() || !deviceName() || connected()"
             >
               <i [class]="scanning() ? 'fas fa-spinner fa-spin' : 'fas fa-link'"></i>
@@ -76,7 +59,7 @@
             </button>
 
             @if (connected()) {
-              <button 
+              <button
                 class="btn btn-danger"
                 (click)="disconnect()"
               >
@@ -89,6 +72,116 @@
       </div>
     </div>
 
+    <!-- Prepare for Testing Card -->
+    @if (connected()) {
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+          <i class="fas fa-flask me-3"></i>
+          <h5 class="mb-0">Prepare for Testing</h5>
+        </div>
+
+        <div class="card-body">
+          <!-- Success Message -->
+          @if (testingParamsSaved()) {
+            <div class="alert alert-success mb-3" role="alert">
+              <i class="fas fa-check-circle me-2"></i>
+              Testing parameters saved successfully!
+            </div>
+          }
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="robotRole" class="form-label">
+                <i class="fas fa-robot me-2"></i>Robot Role
+              </label>
+              <select
+                class="form-select"
+                id="robotRole"
+                [(ngModel)]="robotNumber"
+                [disabled]="testingParamsSaving()"
+              >
+                @for (role of robotRoles; track role) {
+                  <option [value]="role">{{ role }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">
+                <i class="fas fa-arrows-alt-v me-2"></i>Negative Platform
+              </label>
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="negativePlatform"
+                  [(ngModel)]="negativePlatform"
+                  [disabled]="testingParamsSaving()"
+                  style="width: 3rem; height: 1.5rem;"
+                />
+                <label class="form-check-label ms-2" for="negativePlatform">
+                  {{ negativePlatform() ? 'Yes' : 'No' }}
+                </label>
+              </div>
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+              <button
+                class="btn btn-success w-100"
+                (click)="saveTestingParams()"
+                [disabled]="testingParamsSaving()"
+              >
+                <i [class]="testingParamsSaving() ? 'fas fa-spinner fa-spin me-2' : 'fas fa-save me-2'"></i>
+                {{ testingParamsSaving() ? 'Saving...' : 'Save' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Prepare for Mapping Card (only shown when in test mode) -->
+    @if (connected()) {
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+          <i class="fas fa-map me-3"></i>
+          <h5 class="mb-0">Prepare for Mapping</h5>
+        </div>
+
+        <div class="card-body">
+          <!-- Success Message -->
+          @if (mappingPrepared()) {
+            <div class="alert alert-success mb-3" role="alert">
+              <i class="fas fa-check-circle me-2"></i>
+              Robot is ready for mapping!
+            </div>
+          }
+
+          <div class="row g-3 align-items-end">
+            <div class="col-md-8">
+              <p class="mb-0">
+                <i class="fas fa-info-circle me-2 text-info"></i>
+                <strong>Robot Role:</strong> {{ robotNumber() }} |
+                <strong>Negative Platform:</strong> {{ negativePlatform() ? 'Yes' : 'No' }} |
+                <strong>Device:</strong> {{ deviceName() }}
+              </p>
+            </div>
+
+            <div class="col-md-4">
+              <button
+                class="btn btn-primary w-100"
+                (click)="prepareForMapping()"
+                [disabled]="mappingPreparing()"
+              >
+                <i [class]="mappingPreparing() ? 'fas fa-spinner fa-spin me-2' : 'fas fa-play me-2'"></i>
+                {{ mappingPreparing() ? 'Preparing...' : 'Start Mapping' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Robot Status Card with Active Tab Content -->
     @if (connected() && robotStatus()) {
       <div class="card">
@@ -99,7 +192,7 @@
             <small class="card-subtitle">Updates every second</small>
           </div>
         </div>
-        
+
         <div class="card-body">
           <!-- Display Active Tab Content -->
           @if (activeTab() === 'basic') {
