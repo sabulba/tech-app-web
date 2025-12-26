@@ -12,8 +12,8 @@ body {
   color: #000 !important; // Black text
 }
 
-html, body { 
-  height: 100%; 
+html, body {
+  height: 100%;
 }
 
 p, span, div, label, input, button, h1, h2, h3, h4, h5, h6 {
@@ -348,4 +348,176 @@ h3 {
 .footer-btn:active::after {
   width: 200px;
   height: 200px;
+}
+
+// Device Selection Popover
+.device-selection-popover {
+  .popover-body {
+    padding: 0 !important;
+    background: #b0bec5 !important; // Match input text background
+  }
+
+  max-width: 360px !important;
+  background: #b0bec5 !important; // Match input text background
+  border: 1px solid #78909c !important; // Add border
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important; // Add shadow
+  transform: translate3d(20px, 243px, 0px) !important;
+
+  // Style the popover arrow/triangle
+  .popover-arrow::before,
+  .popover-arrow::after {
+    border-bottom-color: #b0bec5 !important;
+    border-top-color: #b0bec5 !important;
+  }
+}
+
+// Additional arrow styling for all placements
+.bs-popover-bottom .popover-arrow::after,
+.bs-popover-auto[data-popper-placement^="bottom"] .popover-arrow::after {
+  border-bottom-color: #b0bec5 !important;
+}
+
+.bs-popover-top .popover-arrow::after,
+.bs-popover-auto[data-popper-placement^="top"] .popover-arrow::after {
+  border-top-color: #b0bec5 !important;
+}
+
+.bs-popover-start .popover-arrow::after,
+.bs-popover-auto[data-popper-placement^="left"] .popover-arrow::after {
+  border-left-color: #b0bec5 !important;
+}
+
+.bs-popover-end .popover-arrow::after,
+.bs-popover-auto[data-popper-placement^="right"] .popover-arrow::after {
+  border-right-color: #b0bec5 !important;
+}
+
+// Motor Selection Popover
+.motor-selection-popover {
+  .popover-body {
+    padding: 0 !important;
+    background: #b0bec5 !important;
+  }
+
+  background: #b0bec5 !important;
+  border: 1px solid #78909c !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+
+  // Style the popover arrow/triangle
+  .popover-arrow::before,
+  .popover-arrow::after {
+    border-bottom-color: #b0bec5 !important;
+    border-top-color: #b0bec5 !important;
+  }
+}
+
+.motor-selection-dialog {
+  font-family: Arial, sans-serif !important;
+  background: #b0bec5 !important;
+
+  .list-group-item {
+    background: #b0bec5 !important;
+    color: #000 !important;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #90a4ae !important;
+    }
+
+    &.active {
+      background: #546e7a !important;
+      color: #fff !important;
+      font-weight: 600;
+    }
+
+    &:last-child {
+      border-bottom: none !important;
+    }
+  }
+}
+
+.device-selection-dialog {
+  font-family: Arial, sans-serif !important;
+  overflow: hidden;
+  background: #b0bec5 !important; // Match input text background
+
+  // Device type icon buttons
+  .device-btn {
+    border-color: #78909c !important;
+    background: #b0bec5 !important;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #90a4ae !important;
+      border-color: #546e7a !important;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    &.active {
+      background: #546e7a !important;
+      border-color: #37474f !important;
+      border-width: 3px !important;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+
+      i, small {
+        color: #fff !important;
+      }
+    }
+  }
+
+  // Input field styling
+  .form-control {
+    background: #b0bec5 !important;
+    border: 1px solid #78909c !important;
+
+    &:focus {
+      background: #cfd8dc !important;
+      border-color: #546e7a !important;
+    }
+  }
+
+  // Compact styling for action buttons
+  .btn-success,
+  .btn-danger {
+    min-height: auto !important;
+
+    i {
+      font-size: 12px !important;
+    }
+  }
+
+  .btn-success {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+
+    &:hover {
+      background-color: #218838 !important;
+      border-color: #1e7e34 !important;
+    }
+
+    &:disabled {
+      opacity: 0.5 !important;
+    }
+  }
+
+  .btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+
+    &:hover {
+      background-color: #c82333 !important;
+      border-color: #bd2130 !important;
+    }
+  }
+
+  // Header styling
+  .border-bottom {
+    border-color: #78909c !important;
+  }
+
+  // Label styling
+  .form-label {
+    color: #000 !important;
+  }
 }
