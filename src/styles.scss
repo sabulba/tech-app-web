@@ -445,7 +445,9 @@ h3 {
   .device-btn {
     border-color: #78909c !important;
     background: #b0bec5 !important;
-    transition: all 0.2s ease;
+    transition: background 0.3s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
 
     &:hover {
       background: #90a4ae !important;
@@ -455,14 +457,104 @@ h3 {
     }
 
     &.active {
-      background: #546e7a !important;
-      border-color: #37474f !important;
-      border-width: 3px !important;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
-
+      background: #78909c !important;
+      border-color: #78909c !important;
+      color: white !important;
+      
       i, small {
-        color: #fff !important;
+        color: white !important;
       }
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    &:active::after {
+      width: 200px;
+      height: 200px;
+    }
+  }
+
+}
+
+// Device Selection Inline (Commands Page)
+.device-selection-inline {
+  // Device type icon buttons (shared with dialog)
+  .device-btn {
+    border-color: #78909c !important;
+    background: #b0bec5 !important;
+    transition: background 0.3s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      background: #90a4ae !important;
+      border-color: #546e7a !important;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    &.active {
+      background: #78909c !important;
+      border-color: #78909c !important;
+      color: white !important;
+      
+      i, small {
+        color: white !important;
+      }
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    &:active::after {
+      width: 200px;
+      height: 200px;
+    }
+  }
+
+  // Action buttons styling (matches motion-service footer buttons)
+  .btn-primary {
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    &:active::after {
+      width: 200px;
+      height: 200px;
     }
   }
 
@@ -488,12 +580,12 @@ h3 {
   }
 
   .btn-success {
-    background-color: #28a745 !important;
-    border-color: #28a745 !important;
+    background-color: #198754 !important;
+    border-color: #198754 !important;
 
     &:hover {
-      background-color: #218838 !important;
-      border-color: #1e7e34 !important;
+      background-color: #157347 !important;
+      border-color: #146c43 !important;
     }
 
     &:disabled {

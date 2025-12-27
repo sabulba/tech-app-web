@@ -35,6 +35,7 @@ export class Commands {
   protected readonly commandSent = signal(false);
   protected readonly selectedMotorType = signal<MotorType>(MotorType.All);
   protected readonly stopCommandSent = signal(false);
+  protected readonly lastActionSent = signal<string>('');
 
   // Temporary selections for the popover dialog
   protected readonly tempDeviceType = signal<RobotTaskType | ''>('');
@@ -50,10 +51,14 @@ export class Commands {
   ) {}
 
   sendCommand() {
-    const deviceType = this.selectedDeviceType();
+    const deviceType = this.tempDeviceType();
     if (deviceType) {
-      const locationNum = this.selectedIndex();
+      const locationNum = this.tempIndex();
       console.log('Sending BLE command:', deviceType, 'at location', locationNum);
+
+      // Update selected values
+      this.selectedDeviceType.set(deviceType);
+      this.selectedIndex.set(locationNum);
 
       // Send BLE command
       this.robotCommandService.sendRobotGoToCmd(
@@ -134,6 +139,7 @@ export class Commands {
    */
   selectDeviceType(type: RobotTaskType) {
     this.tempDeviceType.set(type);
+    this.selectedDeviceType.set(type);
   }
 
   /**
@@ -150,6 +156,7 @@ export class Commands {
     const current = this.tempIndex();
     if (current < 10) {
       this.tempIndex.set(current + 1);
+      this.selectedIndex.set(current + 1);
     }
   }
 
@@ -160,6 +167,7 @@ export class Commands {
     const current = this.tempIndex();
     if (current > 1) {
       this.tempIndex.set(current - 1);
+      this.selectedIndex.set(current - 1);
     }
   }
 
@@ -215,7 +223,7 @@ export class Commands {
   /**
    * Send action command for selected device
    */
-  sendActionCommand(taskType: RobotTaskType) {
+  sendActionCommand(taskType: RobotTaskType, actionLabel: string) {
     const locationNum = this.selectedIndex();
     console.log('Sending action command:', RobotTaskType[taskType], 'at location', locationNum);
 
@@ -224,6 +232,7 @@ export class Commands {
       locationNum,
       (succeed) => {
         if (succeed) {
+          this.lastActionSent.set(actionLabel);
           this.commandSent.set(true);
           setTimeout(() => this.commandSent.set(false), 2000);
         } else {
